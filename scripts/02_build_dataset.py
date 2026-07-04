@@ -1,4 +1,4 @@
-# Build the official processed datasets: singer_level and vocalization-level tables
+# Build the official processed dataset tables.
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.config import DEFAULT_FEATURE_SET_NAME, get_feature_set
+from src.config import MODEL_FEATURE_COLUMNS
 from src.dataset.checks import check_extracted_vocalizations
 from src.dataset.tables import (
     build_singer_level_table,
@@ -24,7 +24,6 @@ from src.dataset.tables import (
 from src.paths import (
     OUTPUT_TABLES_DIR,
     RAW_ALL_DATA_PATH,
-    RAW_EXAMPLES_DATA_PATH,
     SINGER_LEVEL_TABLE_PATH,
     VOCALIZATION_TABLE_PATH,
     ensure_project_dirs,
@@ -34,7 +33,6 @@ from src.paths import (
 def main() -> int:
     parser = argparse.ArgumentParser(description="Create the vocalization-level CSV from the raw workbook.")
     parser.add_argument("--raw-all-data", type=Path, default=RAW_ALL_DATA_PATH)
-    parser.add_argument("--examples-data", type=Path, default=RAW_EXAMPLES_DATA_PATH)
     parser.add_argument("--output", type=Path, default=VOCALIZATION_TABLE_PATH)
     parser.add_argument("--singer-output", type=Path, default=SINGER_LEVEL_TABLE_PATH)
     parser.add_argument(
@@ -46,13 +44,11 @@ def main() -> int:
 
     ensure_project_dirs()
     df = load_vocalizations_from_workbook(args.raw_all_data)
-    examples_path = args.examples_data if args.examples_data.exists() else None
     check_extracted_vocalizations(
         df,
         raw_all_data_path=args.raw_all_data,
-        examples_data_path=examples_path,
     )
-    feature_cols = get_feature_set(DEFAULT_FEATURE_SET_NAME)
+    feature_cols = list(MODEL_FEATURE_COLUMNS)
     singer_df = build_singer_level_table(df, feature_cols)
 
     write_vocalization_table(df, args.output)

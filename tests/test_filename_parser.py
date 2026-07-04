@@ -2,6 +2,7 @@ import pytest
 
 from src.dataset.workbook import parse_filename
 
+
 def test_parse_valid_sample_filename():
     parsed = parse_filename("S1-w035-Uebu-A-a1-1")
 

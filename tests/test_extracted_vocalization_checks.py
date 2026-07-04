@@ -3,12 +3,11 @@ import pytest
 from src.dataset.checks import (
     ExtractedVocalizationError,
     check_alle_sheets_match_class_sheets,
-    check_examples_are_in_all_data,
     check_no_identifier_features,
     check_unique_sample_ids,
 )
 from src.dataset.tables import load_vocalizations_from_workbook
-from src.paths import RAW_ALL_DATA_PATH, RAW_EXAMPLES_DATA_PATH
+from src.paths import RAW_ALL_DATA_PATH
 
 
 def test_extracted_vocalization_checks_real_workbook_if_available():
@@ -19,9 +18,6 @@ def test_extracted_vocalization_checks_real_workbook_if_available():
 
     check_unique_sample_ids(df)
     check_alle_sheets_match_class_sheets(RAW_ALL_DATA_PATH)
-
-    if RAW_EXAMPLES_DATA_PATH.exists():
-        check_examples_are_in_all_data(RAW_EXAMPLES_DATA_PATH, df)
 
 
 def test_check_no_identifier_features_rejects_identifier_features():

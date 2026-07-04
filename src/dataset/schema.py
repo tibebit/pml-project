@@ -1,8 +1,9 @@
-# Schema declarations for the raw workbook and processed tables
+# Schema declarations for the raw workbook and processed tables.
 
 from __future__ import annotations
 
 from collections.abc import Mapping
+
 
 VOCALIZATION_TABLE_COLUMNS = [
     "sample_id",

@@ -9,7 +9,7 @@ import pandas as pd
 from src.dataset.schema import VOICE_CODE_METADATA
 
 
-# Parse the metadata encoded in workbook sample names
+# Parse metadata encoded in workbook sample names.
 _FILENAME_RE = re.compile(
     r"^(?P<raw_voice_code>[A-Z][0-9])-"
     r"(?P<raw_person_code>[wm][0-9]+)-"
@@ -39,7 +39,7 @@ def is_statistic_row(value: Any) -> bool:
     text = "" if value is None else str(value).strip().lower()
     return any(text.startswith(prefix) for prefix in _STATS_PREFIXES)
 
-# Parse a sample filename into voice, class, singer and recording metadata
+
 def parse_filename(filename: Any) -> dict[str, Any]:
     text = "" if filename is None else str(filename).strip()
     if not text:
@@ -58,7 +58,6 @@ def parse_filename(filename: Any) -> dict[str, Any]:
 
     voice_type, class_label = VOICE_CODE_METADATA[raw_voice_code]
     raw_person_code = parsed["raw_person_code"]
-    
     parsed["voice_type"] = voice_type
     parsed["class_label"] = class_label
     parsed["raw_singer_code"] = f"{raw_voice_code}-{raw_person_code}"

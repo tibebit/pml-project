@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from src.config import RAW_ALL_DATA_FILENAME, RAW_EXAMPLES_FILENAME
+from src.config import RAW_ALL_DATA_FILENAME
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -10,7 +10,6 @@ RAW_DATA_DIR = DATA_DIR / "raw"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
 
 RAW_ALL_DATA_PATH = RAW_DATA_DIR / RAW_ALL_DATA_FILENAME
-RAW_EXAMPLES_DATA_PATH = RAW_DATA_DIR / RAW_EXAMPLES_FILENAME
 VOCALIZATION_TABLE_PATH = PROCESSED_DATA_DIR / "vocalization_table.csv"
 SINGER_LEVEL_TABLE_PATH = PROCESSED_DATA_DIR / "singer_level_table.csv"
 

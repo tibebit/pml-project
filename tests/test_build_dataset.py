@@ -5,7 +5,11 @@ import pytest
 
 from src.dataset.checks import check_extracted_vocalizations
 from src.dataset.schema import VOCALIZATION_TABLE_COLUMNS
-from src.dataset.tables import build_singer_level_table, load_vocalizations_from_workbook
+from src.dataset.tables import (
+    build_singer_level_table,
+    load_vocalizations_from_workbook,
+    make_singer_level_feature_columns,
+)
 from src.paths import RAW_ALL_DATA_PATH
 
 
@@ -60,6 +64,15 @@ def test_build_singer_level_table_returns_one_row_per_singer():
     assert "n_vocalizations" in singer_df.columns
     assert "mean_PHE" in singer_df.columns
     assert "sd_SC" in singer_df.columns
+
+
+def test_make_singer_level_feature_columns_matches_table_contract():
+    assert make_singer_level_feature_columns(["PHE", "SC"]) == [
+        "mean_PHE",
+        "mean_SC",
+        "sd_PHE",
+        "sd_SC",
+    ]
 
 
 def _write_minimal_workbook(path: Path) -> None:
