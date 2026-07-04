@@ -7,6 +7,5 @@ __pycache__/
 .venv/
 
 data/raw/Timbre-Vib-Nov-21-SciRep-Examples-Data.xlsx
-data/processed/*
 
 outputs/
