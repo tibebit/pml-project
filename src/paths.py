@@ -21,6 +21,7 @@ OUTPUT_REPORTS_DIR = OUTPUTS_DIR / "reports"
 
 
 def ensure_project_dirs() -> None:
+    """Create project directories before scripts write generated artifacts."""
     for path in (
         RAW_DATA_DIR,
         PROCESSED_DATA_DIR,
