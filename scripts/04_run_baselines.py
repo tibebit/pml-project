@@ -40,10 +40,11 @@ def main() -> int:
     singer_df = pd.read_csv(args.input)
 
     voice_types = MODEL_VOICE_TYPES
-    excluded_singers = singer_df.loc[~singer_df["voice_type"].isin(voice_types), "singer_id"].nunique()
-    singer_df = singer_df.loc[singer_df["voice_type"].isin(voice_types)].copy()
+    unknown_voice_types = sorted(set(singer_df["voice_type"]) - set(voice_types))
+    if unknown_voice_types:
+        raise SystemExit(f"Unexpected voice_type values: {unknown_voice_types}")
     if singer_df.empty:
-        raise SystemExit("No singers remain after voice_type filtering")
+        raise SystemExit("No singers available for baseline evaluation")
 
     # The baseline split is singer-disjoint.
     train_df, test_df = make_final_holdout_split(singer_df, test_size=args.test_size, seed=args.seed)
@@ -61,7 +62,6 @@ def main() -> int:
     print(f"Voice types: {list(voice_types)}")
     print(f"Train singers: {train_df['singer_id'].nunique()}")
     print(f"Test singers: {test_df['singer_id'].nunique()}")
-    print(f"Excluded singers outside baseline voice types: {excluded_singers}")
     print(f"Features: {baseline_feature_cols}")
     print(f"Wrote {predictions_path}")
     print(f"Wrote {metrics_path}")
