@@ -80,9 +80,6 @@ outputs/figures/
 - model: one hierarchical Bayesian model indexed by voice type
 - covariance: diagonal
 
-Identifiers such as `singer_id` and `sample_id` are used for grouping and
-reporting.
-
 ## Tests
 
 ```bash
