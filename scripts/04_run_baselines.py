@@ -12,6 +12,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from src.config import MODEL_FEATURE_COLUMNS, MODEL_VOICE_TYPES, RANDOM_SEED
 from src.dataset.tables import make_singer_level_feature_columns
+from src.evaluation.bootstrap import bootstrap_metric_intervals
 from src.evaluation.metrics import compute_binary_metrics
 from src.models.logistic import fit_logistic, predict_logistic
 from src.models.prevalence import fit_prevalence, predict_prevalence
@@ -25,6 +26,7 @@ def main() -> int:
     parser.add_argument("--input", type=Path, default=SINGER_LEVEL_TABLE_PATH)
     parser.add_argument("--test-size", type=float, default=0.2)
     parser.add_argument("--seed", type=int, default=RANDOM_SEED)
+    parser.add_argument("--bootstrap-repeats", type=int, default=1000)
     parser.add_argument("--tables-dir", type=Path, default=OUTPUT_TABLES_DIR)
     args = parser.parse_args()
 
@@ -52,11 +54,14 @@ def main() -> int:
 
     predictions = _run_models(train_df, test_df, baseline_feature_cols, args.seed)
     metrics = _compute_metrics(predictions)
+    bootstrap = _compute_bootstrap_intervals(predictions, args.bootstrap_repeats, args.seed)
 
     predictions_path = args.tables_dir / "baseline_predictions.csv"
     metrics_path = args.tables_dir / "baseline_metrics.csv"
+    bootstrap_path = args.tables_dir / "baseline_bootstrap_intervals.csv"
     predictions.to_csv(predictions_path, index=False)
     metrics.to_csv(metrics_path, index=False)
+    bootstrap.to_csv(bootstrap_path, index=False)
 
     print(f"Read {args.input}")
     print(f"Voice types: {list(voice_types)}")
@@ -65,6 +70,7 @@ def main() -> int:
     print(f"Features: {baseline_feature_cols}")
     print(f"Wrote {predictions_path}")
     print(f"Wrote {metrics_path}")
+    print(f"Wrote {bootstrap_path}")
     return 0
 
 
@@ -118,6 +124,36 @@ def _compute_metrics(predictions: pd.DataFrame) -> pd.DataFrame:
 
     return pd.DataFrame.from_records(records)[
         ["model", "log_loss", "brier_score", "balanced_accuracy", "n_singers"]
+    ]
+
+
+def _compute_bootstrap_intervals(
+    predictions: pd.DataFrame,
+    n_repeats: int,
+    seed: int,
+) -> pd.DataFrame:
+    frames = []
+    for model_name, model_df in predictions.groupby("model", sort=True):
+        intervals = bootstrap_metric_intervals(
+            model_df,
+            n_repeats=n_repeats,
+            seed=seed,
+            metric_names=("log_loss", "brier_score", "balanced_accuracy"),
+        )
+        intervals.insert(0, "model", model_name)
+        frames.append(intervals)
+
+    return pd.concat(frames, ignore_index=True)[
+        [
+            "model",
+            "metric",
+            "estimate",
+            "lower",
+            "upper",
+            "confidence_level",
+            "bootstrap_repeats",
+            "n_singers",
+        ]
     ]
 
 

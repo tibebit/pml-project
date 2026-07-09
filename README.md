@@ -58,6 +58,7 @@ Pipeline details can be found inside the `scripts/` folder
 ```text
 outputs/tables/final_metrics.csv
 outputs/tables/bootstrap_intervals.csv
+outputs/tables/baseline_bootstrap_intervals.csv
 outputs/tables/mcmc_diagnostics_summary.csv
 outputs/tables/uncertainty_by_m.csv
 outputs/figures/test_uncertainty_vs_m.png
