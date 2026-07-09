@@ -26,7 +26,7 @@ from src.evaluation.final_evaluation import (
     summarize_final_split,
 )
 from src.evaluation.uncertainty import DEFAULT_M_VALUES, plot_uncertainty_vs_m, summarize_uncertainty_by_m
-from src.models.diagnostics import summarize_mcmc_diagnostics_summary
+from src.models.diagnostics import plot_prior_predictive_check, summarize_mcmc_diagnostics_summary
 from src.models.hierarchical_pymc import (
     build_hierarchical_model,
     prepare_hierarchical_data,
@@ -45,6 +45,7 @@ from src.paths import (
 
 MODEL_IDATA_OUTPUT = OUTPUT_MODELS_DIR / "final_train_model_idata.nc"
 MODEL_METADATA_OUTPUT = OUTPUT_MODELS_DIR / "final_train_model_metadata.json"
+PRIOR_PREDICTIVE_FIGURE_OUTPUT = OUTPUT_FIGURES_DIR / "prior_predictive_check.png"
 
 
 def main() -> int:
@@ -162,6 +163,7 @@ def main() -> int:
     _write_csv(diagnostics, args.diagnostics_output)
 
     if not args.no_plots:
+        plot_prior_predictive_check(idata, PRIOR_PREDICTIVE_FIGURE_OUTPUT, feature_cols)
         plot_uncertainty_vs_m(uncertainty, args.uncertainty_figure_output)
 
     print(f"Read {args.input}")
@@ -179,6 +181,7 @@ def main() -> int:
     print(f"Wrote {args.bootstrap_output}")
     print(f"Wrote {args.uncertainty_output}")
     if not args.no_plots:
+        print(f"Wrote {PRIOR_PREDICTIVE_FIGURE_OUTPUT}")
         print(f"Wrote {args.uncertainty_figure_output}")
     print(f"Divergences: {int(diagnostics['n_divergences'].iloc[0])}")
     print(f"Minimum BFMI: {diagnostics['min_bfmi'].iloc[0]}")

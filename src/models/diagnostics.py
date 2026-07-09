@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -8,6 +10,46 @@ from src.models.runtime_env import configure_model_runtime_env
 configure_model_runtime_env()
 
 import arviz as az
+
+
+def plot_prior_predictive_check(
+    idata,
+    output_path: str | Path,
+    feature_names: list[str] | tuple[str, ...],
+) -> Path:
+    prior_x = np.asarray(idata.prior_predictive["x"].sel(feature=feature_names).values, dtype=float)
+    observed_x = np.asarray(idata.observed_data["x"].sel(feature=feature_names).values, dtype=float)
+
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    fig, axes = plt.subplots(1, len(feature_names), figsize=(5.0 * len(feature_names), 4.0))
+    axes = np.atleast_1d(axes)
+    for axis, feature_name, feature_prior, feature_observed in zip(
+        axes,
+        feature_names,
+        np.moveaxis(prior_x, -1, 0),
+        np.moveaxis(observed_x, -1, 0),
+    ):
+        prior_values = feature_prior.reshape(-1)
+        observed_values = feature_observed.reshape(-1)
+        axis.hist(prior_values, bins=50, density=True, alpha=0.45, label="prior predictive")
+        axis.hist(observed_values, bins=50, density=True, alpha=0.45, label="observed")
+        axis.set_title(feature_name)
+        axis.set_xlabel("standardized value")
+        axis.set_ylabel("density")
+        axis.legend()
+
+    fig.suptitle("Prior predictive check")
+    fig.tight_layout()
+
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(path, dpi=160)
+    plt.close(fig)
+    return path
 
 
 def summarize_mcmc_diagnostics_summary(

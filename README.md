@@ -61,6 +61,7 @@ outputs/tables/bootstrap_intervals.csv
 outputs/tables/baseline_bootstrap_intervals.csv
 outputs/tables/mcmc_diagnostics_summary.csv
 outputs/tables/uncertainty_by_m.csv
+outputs/figures/prior_predictive_check.png
 outputs/figures/test_uncertainty_vs_m.png
 outputs/models/final_train_model_idata.nc
 outputs/models/final_train_model_metadata.json
